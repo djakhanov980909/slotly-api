@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Service;
+use App\Models\WorkingHour;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,11 +17,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::factory()->admin()->create(['name' => 'Admin', 'email' => 'admin@slotly.test']);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $services = collect([
+            ['Стрижка', 30, 5000],
+            ['Окрашивание', 120, 20000],
+            ['Маникюр', 60, 8000],
+        ])->map(fn (array $s) => Service::create([
+            'name' => $s[0], 'duration_minutes' => $s[1], 'price' => $s[2],
+        ]));
+
+        User::factory(3)->specialist()->create()->each(function (User $specialist) use ($services) {
+            $specialist->services()->attach($services->pluck('id'));
+
+            foreach (range(1, 5) as $weekday) {
+                foreach ([['09:00', '13:00'], ['14:00', '18:00']] as [$start, $end]) {
+                    WorkingHour::create([
+                        'specialist_id' => $specialist->id,
+                        'weekday' => $weekday,
+                        'start_time' => $start,
+                        'end_time' => $end,
+                    ]);
+                }
+            }
+        });
     }
 }
