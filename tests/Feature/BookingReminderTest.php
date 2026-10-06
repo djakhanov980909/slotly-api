@@ -13,6 +13,7 @@ function bookingIn(int $hours, array $extra = []): Booking
     return Booking::factory()->create(array_merge([
         'starts_at' => now()->addHours($hours),
         'ends_at' => now()->addHours($hours)->addHour(),
+        'created_at' => now()->subDay(),
     ], $extra));
 }
 
@@ -54,4 +55,28 @@ it('skips cancelled and past bookings', function () {
     $this->artisan('app:send-booking-reminders');
 
     Notification::assertNothingSent();
+});
+
+it('does not remind about a recently created booking', function () {
+    Notification::fake();
+
+    $booking = bookingIn(5, [
+        'created_at' => now(),
+    ]);
+
+    $this->artisan('app:send-booking-reminders')->assertSuccessful();
+
+    Notification::assertNotSentTo($booking->client, BookingReminder::class);
+    expect($booking->fresh()->reminder_sent_at)->toBeNull();
+});
+
+it('reminds only after the booking is more than an hour old', function () {
+    Notification::fake();
+    $old = bookingIn(5, ['created_at' => now()->subMinutes(61)]);
+    $fresh = bookingIn(5, ['created_at' => now()->subMinutes(59)]);
+
+    $this->artisan('app:send-booking-reminders');
+
+    Notification::assertSentTo($old->client, BookingReminder::class);
+    Notification::assertNotSentTo($fresh->client, BookingReminder::class);
 });

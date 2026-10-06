@@ -23,6 +23,7 @@ class SendBookingReminders extends Command
             ->whereNull('reminder_sent_at')
             ->where('starts_at', '>', now())
             ->where('starts_at', '<=', now()->addDay())
+            ->where('created_at', '<=', now()->subMinutes(60))
             ->chunkById(100, function ($bookings) use (&$sent) {
                 foreach ($bookings as $booking) {
                     // Сначала «занимаем» запись одним атомарным UPDATE, потом шлём письмо
