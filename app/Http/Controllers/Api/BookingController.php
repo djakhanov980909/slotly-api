@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\BookingStatus;
 use App\Enums\Role;
+use App\Events\BookingCancelled;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Resources\BookingResource;
@@ -50,11 +51,13 @@ class BookingController extends Controller
         return new BookingResource($booking->load(['service', 'specialist', 'client']));
     }
 
-    public function cancel(Booking $booking): BookingResource
+    public function cancel(Request $request, Booking $booking): BookingResource
     {
         Gate::authorize('cancel', $booking);
 
         $booking->update(['status' => BookingStatus::Cancelled]);
+
+        BookingCancelled::dispatch($booking, $request->user()->id);
 
         return new BookingResource($booking->load(['service', 'specialist', 'client']));
     }

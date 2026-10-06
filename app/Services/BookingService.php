@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\BookingStatus;
+use App\Events\BookingCreated;
 use App\Exceptions\SlotUnavailableException;
 use App\Models\Booking;
 use App\Models\Service;
@@ -37,7 +38,7 @@ class BookingService
 
         // Слой 2: база данных не даст создать пересекающуюся запись
         try {
-            return DB::transaction(fn () => Booking::create([
+            $booking = DB::transaction(fn () => Booking::create([
                 'client_id' => $client->id,
                 'specialist_id' => $specialist->id,
                 'service_id' => $service->id,
@@ -53,5 +54,9 @@ class BookingService
 
             throw $e;
         }
+
+        BookingCreated::dispatch($booking);
+
+        return $booking;
     }
 }

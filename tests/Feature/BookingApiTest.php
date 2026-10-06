@@ -4,9 +4,12 @@ use App\Models\Booking;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\WorkingHour;
+use App\Notifications\BookingCancelledNotice;
+use App\Notifications\BookingConfirmed;
 use App\Services\SlotService;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
@@ -150,4 +153,40 @@ it('forbids cancelling someone elses booking', function () {
     Sanctum::actingAs(User::factory()->create());
 
     $this->postJson("/api/bookings/{$booking->id}/cancel")->assertForbidden();
+});
+
+it('notifies the client after booking', function () {
+    Notification::fake();
+    [$specialist, $service] = bookable();
+    $client = User::factory()->create();
+    Sanctum::actingAs($client);
+
+    $this->postJson('/api/bookings', bookingPayload($specialist, $service))->assertCreated();
+
+    Notification::assertSentTo($client, BookingConfirmed::class);
+});
+
+it('sends no confirmation when the slot is taken', function () {
+    Notification::fake();
+    [$specialist, $service] = bookable();
+
+    Sanctum::actingAs(User::factory()->create());
+    $this->postJson('/api/bookings', bookingPayload($specialist, $service))->assertCreated();
+
+    $second = User::factory()->create();
+    Sanctum::actingAs($second);
+    $this->postJson('/api/bookings', bookingPayload($specialist, $service))->assertStatus(409);
+
+    Notification::assertNotSentTo($second, BookingConfirmed::class);
+});
+
+it('notifies the other party when a booking is cancelled', function () {
+    Notification::fake();
+    $booking = Booking::factory()->create();
+    Sanctum::actingAs($booking->client);
+
+    $this->postJson("/api/bookings/{$booking->id}/cancel")->assertOk();
+
+    Notification::assertSentTo($booking->specialist, BookingCancelledNotice::class);
+    Notification::assertNotSentTo($booking->client, BookingCancelledNotice::class);
 });
