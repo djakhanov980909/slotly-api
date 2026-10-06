@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Service;
 use App\Models\User;
+use App\Models\WorkingHour;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Service;
-use App\Models\WorkingHour;
 
 class DatabaseSeeder extends Seeder
 {
