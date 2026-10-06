@@ -30,6 +30,7 @@ class BookingConfirmed extends Notification implements ShouldQueueAfterCommit
             ->line("Вы записаны на услугу «{$booking->service->name}».")
             ->line("Специалист: {$booking->specialist->name}")
             ->line("Время: {$time}")
-            ->line('Стоимость: '.number_format($booking->price, 0, '.', ' '));
+            ->line('Стоимость: '.number_format($booking->price, 0, '.', ' '))
+            ->salutation('С уважением, Slotly');
     }
 }

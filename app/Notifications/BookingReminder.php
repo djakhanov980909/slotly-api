@@ -4,11 +4,11 @@ namespace App\Notifications;
 
 use App\Models\Booking;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class BookingCancelledNotice extends Notification implements ShouldQueueAfterCommit
+class BookingReminder extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -21,13 +21,15 @@ class BookingCancelledNotice extends Notification implements ShouldQueueAfterCom
 
     public function toMail(object $notifiable): MailMessage
     {
-        $booking = $this->booking->loadMissing('service');
+        $booking = $this->booking->loadMissing(['service', 'specialist']);
         $time = $booking->starts_at->setTimezone(config('slotly.timezone'))->format('d.m.Y H:i');
 
         return (new MailMessage)
-            ->subject('Запись отменена')
+            ->subject('Напоминание о записи')
             ->greeting("Здравствуйте, {$notifiable->name}!")
-            ->line("Запись на «{$booking->service->name}» ({$time}) была отменена.")
+            ->line("Напоминаем: скоро у вас запись на «{$booking->service->name}».")
+            ->line("Специалист: {$booking->specialist->name}")
+            ->line("Время: {$time}")
             ->salutation('С уважением, Slotly');
     }
 }

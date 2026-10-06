@@ -24,6 +24,7 @@ class Booking extends Model
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
             'status' => BookingStatus::class,
+            'reminder_sent_at' => 'datetime',
         ];
     }
 
