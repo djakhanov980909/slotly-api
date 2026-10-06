@@ -33,8 +33,15 @@ jobs:
           extensions: pdo_pgsql, mbstring, bcmath, intl
           coverage: none
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
       - run: cp .env.example .env
       - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: npm ci
+      - run: npm run build
       - run: php artisan key:generate
 
       - name: Run tests
