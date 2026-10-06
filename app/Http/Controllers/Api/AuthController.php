@@ -21,6 +21,7 @@ class AuthController extends Controller
         $user = new User($request->safe()->only(['name', 'email', 'phone', 'password']));
         $user->role = Role::Client;
         $user->save();
+        $user->refresh();
 
         return response()->json([
             'user' => new UserResource($user),

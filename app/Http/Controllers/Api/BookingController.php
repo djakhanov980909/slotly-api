@@ -55,10 +55,11 @@ class BookingController extends Controller
     {
         Gate::authorize('cancel', $booking);
 
+        $booking->load(['service', 'specialist', 'client']);
         $booking->update(['status' => BookingStatus::Cancelled]);
 
         BookingCancelled::dispatch($booking, $request->user()->id);
 
-        return new BookingResource($booking->load(['service', 'specialist', 'client']));
+        return new BookingResource($booking);
     }
 }

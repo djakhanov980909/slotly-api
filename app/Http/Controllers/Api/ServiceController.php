@@ -27,7 +27,7 @@ class ServiceController extends Controller
 
     public function store(StoreServiceRequest $request): ServiceResource
     {
-        return new ServiceResource(Service::create($request->validated()));
+        return new ServiceResource(Service::create($request->validated())->refresh());
     }
 
     public function update(UpdateServiceRequest $request, Service $service): ServiceResource
