@@ -73,6 +73,7 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class, 'client_id');
     }
 
+    /** @return HasMany<Booking, $this> */
     public function specialistBookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'specialist_id');

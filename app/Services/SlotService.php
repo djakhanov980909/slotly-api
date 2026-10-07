@@ -9,6 +9,7 @@ use App\Models\TimeOff;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class SlotService
@@ -59,7 +60,7 @@ class SlotService
     /**
      * Занятые интервалы: неотменённые записи и отпуска.
      *
-     * @return Collection<int, array{0: CarbonInterface, 1: CarbonInterface}>
+     * @return Collection<int, array{0: Carbon, 1: Carbon}>
      */
     private function busyIntervals(User $specialist, CarbonImmutable $from, CarbonImmutable $to): Collection
     {
@@ -83,7 +84,7 @@ class SlotService
         return $bookings->concat($timeOffs)->values();
     }
 
-    /** @param Collection<int, array{0: CarbonInterface, 1: CarbonInterface}> $busy */
+    /** @param Collection<int, array{0: Carbon, 1: Carbon}> $busy */
     private function overlapsAny(CarbonImmutable $start, CarbonImmutable $end, Collection $busy): bool
     {
         // Интервалы полуоткрытые [начало, конец): запись до 10:00 не мешает записи с 10:00.
