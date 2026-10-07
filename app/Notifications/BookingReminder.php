@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Booking;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -14,12 +15,13 @@ class BookingReminder extends Notification implements ShouldQueue
 
     public function __construct(public Booking $booking) {}
 
-    public function via(object $notifiable): array
+    /** @return array<int, string> */
+    public function via(User $notifiable): array
     {
         return ['mail'];
     }
 
-    public function toMail(object $notifiable): MailMessage
+    public function toMail(User $notifiable): MailMessage
     {
         $booking = $this->booking->loadMissing(['service', 'specialist']);
         $time = $booking->starts_at->setTimezone(config('slotly.timezone'))->format('d.m.Y H:i');

@@ -43,8 +43,8 @@ class BookingController extends Controller
 
         $booking = $bookings->create(
             $request->user(),
-            User::findOrFail($request->validated('specialist_id')),
-            Service::findOrFail($request->validated('service_id')),
+            User::findOrFail((int) $request->validated('specialist_id')),
+            Service::findOrFail((int) $request->validated('service_id')),
             $start,
         );
 

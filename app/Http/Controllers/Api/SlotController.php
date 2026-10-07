@@ -21,7 +21,7 @@ class SlotController extends Controller
     {
         abort_unless($specialist->role === Role::Specialist, 404);
 
-        $service = Service::where('is_active', true)->findOrFail($request->validated('service_id'));
+        $service = Service::where('is_active', true)->findOrFail((int) $request->validated('service_id'));
 
         abort_unless($specialist->services()->whereKey($service->id)->exists(), 404);
 

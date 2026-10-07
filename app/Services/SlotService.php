@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Enums\BookingStatus;
+use App\Models\Booking;
 use App\Models\Service;
+use App\Models\TimeOff;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -69,17 +71,19 @@ class SlotService
             ->where('status', '!=', BookingStatus::Cancelled->value)
             ->where('starts_at', '<', $to)
             ->where('ends_at', '>', $from)
-            ->get(['starts_at', 'ends_at']);
+            ->get(['starts_at', 'ends_at'])
+            ->map(fn (Booking $b) => [$b->starts_at, $b->ends_at]);
 
         $timeOffs = $specialist->timeOffs()
             ->where('starts_at', '<', $to)
             ->where('ends_at', '>', $from)
-            ->get(['starts_at', 'ends_at']);
+            ->get(['starts_at', 'ends_at'])
+            ->map(fn (TimeOff $t) => [$t->starts_at, $t->ends_at]);
 
-        return $bookings->concat($timeOffs)
-            ->map(fn ($interval) => [$interval->starts_at, $interval->ends_at]);
+        return $bookings->concat($timeOffs)->values();
     }
 
+    /** @param Collection<int, array{0: CarbonInterface, 1: CarbonInterface}> $busy */
     private function overlapsAny(CarbonImmutable $start, CarbonImmutable $end, Collection $busy): bool
     {
         // Интервалы полуоткрытые [начало, конец): запись до 10:00 не мешает записи с 10:00.

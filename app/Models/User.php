@@ -24,6 +24,8 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property string|null $phone
+ * @property Role $role
  */
 #[Fillable(['name', 'email', 'password', 'phone'])]
 #[Hidden(['password', 'remember_token'])]
@@ -47,21 +49,25 @@ class User extends Authenticatable
 
     }
 
+    /** @return BelongsToMany<Service, $this> */
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'service_specialist', 'specialist_id', 'service_id');
     }
 
+    /** @return HasMany<WorkingHour, $this> */
     public function workingHours(): HasMany
     {
         return $this->hasMany(WorkingHour::class, 'specialist_id');
     }
 
+    /** @return HasMany<TimeOff, $this> */
     public function timeOffs(): HasMany
     {
         return $this->hasMany(TimeOff::class, 'specialist_id');
     }
 
+    /** @return HasMany<Booking, $this> */
     public function clientBookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'client_id');

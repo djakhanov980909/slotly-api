@@ -12,6 +12,7 @@ class StoreServiceRequest extends FormRequest
         return $this->user()->can('create', Service::class);
     }
 
+    /** @return array<string, array<int, mixed>> */
     public function rules(): array
     {
         return [

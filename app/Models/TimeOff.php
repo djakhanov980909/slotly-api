@@ -6,7 +6,15 @@ use Database\Factories\TimeOffFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $specialist_id
+ * @property Carbon $starts_at
+ * @property Carbon $ends_at
+ * @property string|null $reason
+ */
 class TimeOff extends Model
 {
     /** @use HasFactory<TimeOffFactory> */
@@ -22,6 +30,7 @@ class TimeOff extends Model
         ];
     }
 
+    /** @return BelongsTo<User, $this> */
     public function specialist(): BelongsTo
     {
         return $this->belongsTo(User::class, 'specialist_id');
