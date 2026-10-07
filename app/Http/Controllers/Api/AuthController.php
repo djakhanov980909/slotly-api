@@ -16,6 +16,9 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    /**
+     * @unauthenticated
+     */
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = new User($request->safe()->only(['name', 'email', 'phone', 'password']));
@@ -29,6 +32,9 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * @unauthenticated
+     */
     public function login(LoginRequest $request): JsonResponse
     {
         $user = User::where('email', $request->validated('email'))->first();

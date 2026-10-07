@@ -21,7 +21,7 @@ class StoreBookingRequest extends FormRequest
                 'required',
                 'integer',
                 Rule::exists('users', 'id')->where('role', Role::Specialist->value),
-                Rule::notIn([$this->user()->id]),
+                Rule::notIn([$this->user()?->id]),
             ],
             'service_id' => [
                 'required',

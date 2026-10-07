@@ -16,6 +16,8 @@ class SlotController extends Controller
 {
     /**
      * Handle the incoming request.
+     *
+     * @unauthenticated
      */
     public function __invoke(SlotsRequest $request, User $specialist, SlotService $slots): JsonResponse
     {

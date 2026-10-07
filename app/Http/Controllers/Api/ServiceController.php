@@ -11,6 +11,9 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ServiceController extends Controller
 {
+    /**
+     * @unauthenticated
+     */
     public function index(): AnonymousResourceCollection
     {
         return ServiceResource::collection(
@@ -18,6 +21,9 @@ class ServiceController extends Controller
         );
     }
 
+    /**
+     * @unauthenticated
+     */
     public function show(Service $service): ServiceResource
     {
         abort_unless($service->is_active, 404);

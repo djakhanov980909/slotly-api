@@ -44,6 +44,12 @@ jobs:
       - run: npm run build
       - run: php artisan key:generate
 
+      - name: Code style
+        run: ./vendor/bin/pint --test
+
+      - name: Static analysis
+        run: ./vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+
       - name: Run tests
         env:
           DB_CONNECTION: pgsql
