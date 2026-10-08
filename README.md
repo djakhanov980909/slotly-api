@@ -14,6 +14,10 @@ the API guarantees that two people can never book the same slot.
 - Queued e-mail confirmations and cancellations, scheduled reminders
 - Auto-generated OpenAPI documentation
 
+## Web client
+
+A React client lives in [slotly-web](https://github.com/djakhanov980909/slotly-web).
+
 ## Tech
 
 PHP 8.5, Laravel 13, PostgreSQL 18, Redis, Pest, Larastan (level 7), Laravel Sail, GitHub Actions.
