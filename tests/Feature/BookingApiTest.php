@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Service;
 use App\Models\User;
@@ -189,4 +190,20 @@ it('notifies the other party when a booking is cancelled', function () {
 
     Notification::assertSentTo($booking->specialist, BookingCancelledNotice::class);
     Notification::assertNotSentTo($booking->client, BookingCancelledNotice::class);
+});
+
+it('tells the client whether a booking can be cancelled', function () {
+    $booking = Booking::factory()->create();
+    $cancelled = Booking::factory()->create([
+        'client_id' => $booking->client_id,
+        'starts_at' => now()->addDays(2),
+        'ends_at' => now()->addDays(2)->addHour(),
+        'status' => BookingStatus::Cancelled,
+    ]);
+    Sanctum::actingAs($booking->client);
+
+    $response = $this->getJson('/api/bookings')->assertOk();
+
+    expect(collect($response->json('data'))->pluck('can_cancel', 'id')->all())
+        ->toEqual([$cancelled->id => false, $booking->id => true]);
 });

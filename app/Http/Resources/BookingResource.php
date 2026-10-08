@@ -26,6 +26,7 @@ class BookingResource extends JsonResource
             'specialist' => new SpecialistResource($this->whenLoaded('specialist')),
             // SpecialistResource отдаёт только id и name, для клиента этого достаточно
             'client' => new SpecialistResource($this->whenLoaded('client')),
+            'can_cancel' => (bool) $request->user()?->can('cancel', $this->resource),
         ];
     }
 }
